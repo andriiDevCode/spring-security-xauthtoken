@@ -1,0 +1,18 @@
+services:
+
+  postgres:
+    image: postgres
+    container_name: postgres_security
+    environment:
+      - POSTGRES_USER=security_user
+      - POSTGRES_PASSWORD=secret
+    ports:
+      - 5432:5432
+    restart: always
+
+  redis:
+    image: redis
+    container_name: redis_security
+    ports:
+      - 6379:6379
+    restart: always

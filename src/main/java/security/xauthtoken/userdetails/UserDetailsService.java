@@ -1,0 +1,21 @@
+package security.xauthtoken.userdetails;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+import security.xauthtoken.entity.UserEntity;
+import security.xauthtoken.repository.UserRepository;
+
+@Service
+@RequiredArgsConstructor
+public class UserDetailsService implements org.springframework.security.core.userdetails.UserDetailsService {
+    private final UserRepository userRepository;
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        UserEntity userEntity = userRepository
+                .findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("There is no user with such email"));
+        return new UserDetails(userEntity);
+    }
+}
