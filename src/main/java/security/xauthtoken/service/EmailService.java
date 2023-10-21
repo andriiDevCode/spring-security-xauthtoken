@@ -37,20 +37,17 @@ public class EmailService {
     }
 
     public void verifyUserEmail(long userId, String code) {
-        Optional<VerificationCodeEntity> emailCodeOptional = verificationCodeRepository.findByCode(code);
+        Optional<VerificationCodeEntity> emailCodeOptional = verificationCodeRepository.findByCodeAndUserId(code, userId);
         Optional<UserEntity> userEntityOptional = userRepository.findById(userId);
         if (emailCodeOptional.isEmpty() || userEntityOptional.isEmpty()) {
             throw new VerificationCodeException();
         }
-
         UserEntity userEntity = userEntityOptional.get();
-        if (userId != emailCodeOptional.get().getUser().getId()) {
-            throw new VerificationCodeException();
-        }
         userEntity.setVerified(true);
         userRepository.save(userEntity);
     }
 
+    @Transactional
     public void sendEmailCode(String email) {
         Optional<UserEntity> userOptional = userRepository.findByEmail(email);
         if (userOptional.isEmpty()) {

@@ -1,6 +1,6 @@
 package security.xauthtoken.service;
 
-import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,7 +26,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
 
-    public void signup(HttpServletRequest httpServletRequest, AuthRequest authRequest) {
+    public void signup(HttpSession httpSession, AuthRequest authRequest) {
         Optional<UserEntity> userEntityOptional = userRepository.findByEmail(authRequest.getEmail());
         if (userEntityOptional.isPresent()) {
             throw new BadRequestException("User with such email already exists");
@@ -37,14 +37,14 @@ public class AuthService {
         userEntity.setVerified(false);
         userRepository.save(userEntity);
         emailService.sendEmailCode(authRequest.getEmail());
-        login(httpServletRequest, authRequest.getEmail(), authRequest.getPassword());
+        login(httpSession, authRequest.getEmail(), authRequest.getPassword());
     }
 
-    public void login(HttpServletRequest httpServletRequest, String email, String password) {
+    public void login(HttpSession httpSession, String email, String password) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(email, password));
         SecurityContext context = SecurityContextHolder.getContext();
         context.setAuthentication(authentication);
-        httpServletRequest.getSession().setAttribute(SPRING_SECURITY_CONTEXT_KEY, context);
+        httpSession.setAttribute(SPRING_SECURITY_CONTEXT_KEY, context);
     }
 }

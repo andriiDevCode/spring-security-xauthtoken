@@ -1,6 +1,6 @@
 package security.xauthtoken.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,14 +18,14 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public AuthResponse login(@Valid @RequestBody AuthRequest authRequest, HttpServletRequest httpServletRequest) {
-        authService.login(httpServletRequest, authRequest.getEmail(), authRequest.getPassword());
-        return new AuthResponse(httpServletRequest.getSession().getId());
+    public AuthResponse login(@Valid @RequestBody AuthRequest authRequest, HttpSession httpSession) {
+        authService.login(httpSession, authRequest.getEmail(), authRequest.getPassword());
+        return new AuthResponse(httpSession.getId());
     }
 
     @PostMapping("/signup")
-    public AuthResponse signup(@Valid @RequestBody AuthRequest authRequest, HttpServletRequest httpServletRequest) {
-        authService.signup(httpServletRequest, authRequest);
-        return new AuthResponse(httpServletRequest.getSession().getId());
+    public AuthResponse signup(@Valid @RequestBody AuthRequest authRequest, HttpSession httpSession) {
+        authService.signup(httpSession, authRequest);
+        return new AuthResponse(httpSession.getId());
     }
 }
